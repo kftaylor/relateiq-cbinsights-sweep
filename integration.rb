@@ -35,13 +35,27 @@ post '/' do
       status 200
     end
 
-    #list = RelateIQ::List.find('53594f2ee4b0336349b9759a')
+    list = RelateIQ::List.find('535b4d8fe4b082b80fbf0618')
     list_id = '535b4d8fe4b082b80fbf0618'
 
     CSV.new(tmpfile.read, :headers => true).each do |row|
       acc = RelateIQ::Account.new
       acc.create(name: row['Company'])
-      RelateIQ.post("lists/#{list_id}/listitems", {:accountId => acc.id, :name => acc.name, :contactIds => ['']}.to_json)
+
+      fields = row.headers.select do |key|
+        list.fields.find {|f| f['name'].downcase == key.downcase}
+      end.map do |key|
+        f = list.fields.find {|f| f['name'].downcase == key.downcase}
+        [f['id'], ['raw' => row[key]]]
+      end
+
+      list_attrs = {
+          :accountId => acc.id,
+          :name => acc.name,
+          :contactIds => [''],
+          :fields => Hash[fields]
+      }
+      RelateIQ.post("lists/#{list_id}/listitems", list_attrs.to_json)
     end
 
     status 201
