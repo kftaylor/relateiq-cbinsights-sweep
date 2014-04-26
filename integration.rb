@@ -23,7 +23,7 @@ before do
 end
 
 get '/' do
-  'CopperEgg Webhook Handler Example'
+  'RelateIQ integration example'
 end
 
 post '/' do
@@ -32,15 +32,16 @@ post '/' do
     unless params['attachment-1'] &&
         (tmpfile = params['attachment-1'][:tempfile]) &&
         (name = params['attachment-1'][:filename])
-      @error = "No file selected"
+      status 200
     end
-    s = tmpfile.read
-    #STDERR.puts s
-    CSV.new(s, :headers => true).each do |row|
-      STDERR.puts row.inspect
-      c = RelateIQ::Account.new
-      c.create(name: row['Company'])
 
+    #list = RelateIQ::List.find('53594f2ee4b0336349b9759a')
+    list_id = '535b4d8fe4b082b80fbf0618'
+
+    CSV.new(tmpfile.read, :headers => true).each do |row|
+      acc = RelateIQ::Account.new
+      acc.create(name: row['Company'])
+      RelateIQ.post("lists/#{list_id}/listitems", {:accountId => acc.id, :name => acc.name, :contactIds => ['']}.to_json)
     end
 
     status 201
@@ -49,5 +50,4 @@ post '/' do
     status 500
   end
 end
-
 

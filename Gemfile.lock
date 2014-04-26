@@ -1,6 +1,6 @@
 GIT
   remote: git://github.com/ivanovv/relateiq.git
-  revision: 8d525d0d2d40cfed11fe7c85db0a18ed85da66d7
+  revision: 2d9c25a88a5e7f9226d09ca388204f881956d24b
   specs:
     relateiq (0.0.2)
       faraday (~> 0.8, < 0.10)
@@ -20,7 +20,7 @@ GEM
       multipart-post (>= 1.2, < 3)
     faraday_middleware (0.9.1)
       faraday (>= 0.7.4, < 0.10)
-    json (1.7.4)
+    json (1.8.1)
     method_source (0.8.2)
     multipart-post (2.0.0)
     pry (0.9.12.6)
