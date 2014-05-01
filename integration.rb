@@ -92,7 +92,7 @@ def create_account_and_list_item(row, list)
       :contactIds => [''],
       :fieldValues => Hash[fields]
   }
-  RelateIQ.post("lists/#{list_id}/listitems", list_attrs.to_json)
+  RelateIQ.post("lists/#{list.id}/listitems", list_attrs.to_json)
 
 end
 
