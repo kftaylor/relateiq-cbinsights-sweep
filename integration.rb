@@ -122,11 +122,11 @@ def success_email(report_name, rows)
       s = "#{rows.length} companies were successfully added to RelateIQ via CBinsights (#{report_name}) sweep:\n"
       rows.each_with_index do |r, i|
         desc = r['Company Description'].split('.').first if r['Company Description']
-        s << "#{r['Company']}"
+        s << "#{i}. #{r['Company']}"
         s << " - \"#{desc}\"" if desc
         s << "\n  * "
         s << "#{r['Round']}" if r['Round']
-        s << " (#{r['Amount']})" if r['Amount']
+        s << " ($#{r['Amount']}m)" if r['Amount']
         s << " with #{r['Investors']}"  if r['Investors']
         s << "\n"
       end
