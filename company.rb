@@ -56,6 +56,7 @@ class Company
       [ivar.to_s.sub('@', '').to_sym, self.instance_variable_get(ivar)]
     end
     ]
+    attrs.delete :sector
     emails.insert(attrs)
   end
 
