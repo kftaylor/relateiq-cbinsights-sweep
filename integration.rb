@@ -36,7 +36,6 @@ configure do
     String       :error_message
     Date         :created_at
   end
-  imports = DB[:imports]
 
   DB.create_table? :companies do
     primary_key  :id
@@ -75,7 +74,7 @@ post '/' do
     parsed, failed = import.process_csv
     success_email(report_name, parsed) if !parsed.empty?
     error_email(failed) if !failed.empty?
-    import.to_db(imports)
+    import.to_db
     status 201
   rescue => e
     logger.error e

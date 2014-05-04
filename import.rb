@@ -48,8 +48,8 @@ class Import
   end
 
 
-  def to_db(db)
-    db.insert(
+  def to_db
+    DB[:imports].insert(
         :report_name => @report_name,
         :created_at => Date.today,
         :csv_content => @csv,
