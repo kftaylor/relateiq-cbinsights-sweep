@@ -27,7 +27,7 @@ class Company
     email << (index ? "#{index}. #{@name}" : @name)
     email << " - \"#{@description}\"" if @description
     email << "\n  * "
-    email << @round if round
+    email << @round if @round
     email << " ($#{@amount}m)" if @amount > 0
     email << " with investors: #{@investors}" if @investors
     email << "\n"
@@ -45,7 +45,7 @@ class Company
       list.fields.find { |f| f['name'].downcase == key }
     end.map do |key|
       f = list.fields.find { |f| f['name'].downcase == key }
-      [f['id'], [{'raw' => self.send("@#{key}")}]]
+      [f['id'], [{'raw' => self.send(key).to_s}]]
     end
     fields << [0, [{'raw' => 0}]]
   end
