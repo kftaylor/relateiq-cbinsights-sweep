@@ -39,7 +39,7 @@ class Import
     fields = company.relate_iq_fields(@list)
     list_attrs = {
         :accountId => acc.id,
-        :listId => list.id,
+        :listId => @list.id,
         :name => acc.name,
         :contactIds => [''],
         :fieldValues => Hash[fields]
