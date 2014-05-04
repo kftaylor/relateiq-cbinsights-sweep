@@ -91,9 +91,10 @@ def success_email(report_name, companies)
     from 'RelateIQ integration robot <integration@domain.com>'
     subject 'Just got one more CBInsights email'
     text_part do
-      email = "#{companies.length} companies were successfully added to RelateIQ via CBinsights (#{report_name}) sweep:\n"
+      companies_text = companies.length > 1 ? "#{companies.length} companies were" : "One company was"
+      email = "#{companies_text} successfully added to RelateIQ via CBinsights (#{report_name}) sweep:\n"
       companies.each_with_index do |c, i|
-        email << c.to_email(i)
+        email << c.to_email(i+1)
       end
       body email
     end

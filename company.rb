@@ -1,5 +1,5 @@
 class Company
-  attr_accessor   :report_name, :name, :url, :description,
+  attr_accessor   :report_name, :name, :sector, :url, :description,
                   :round, :amount, :investors, :date
 
   def initialize(row = nil)
@@ -9,6 +9,7 @@ class Company
   def parse_row(row)
     @description = row['Company Description'].split('.').first if row['Company Description']
     @name = row['Company']
+    @sector = row['Sector']
     @url = row['Company URL']
     self.round = row['Round']
     @amount = (row['Amount'].to_f) if row['Amount'] && !row['Amount'].empty?
