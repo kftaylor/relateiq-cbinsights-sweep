@@ -57,6 +57,7 @@ class Company
     end
     ]
     attrs.delete :sector
+    attrs[:created_at] = Date.today
     emails.insert(attrs)
   end
 

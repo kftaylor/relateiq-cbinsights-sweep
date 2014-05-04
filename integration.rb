@@ -47,6 +47,7 @@ configure do
     Float        :amount
     String       :investors
     Date         :date
+    Date         :created_at
   end
   companies = DB[:companies]
 
@@ -58,6 +59,10 @@ end
 
 get '/' do
   'RelateIQ integration example'
+end
+
+get '/weekly' do
+  weekly_email
 end
 
 post '/' do
@@ -102,6 +107,21 @@ def success_email(report_name, companies)
 end
 
 def weekly_email
+  companies = DB[:companies].where{date >= (Date.today - 7)}.all.map{|c| Company.from_db c}
+  Mail.deliver do
+    to 'taylor.k.f@gmail.com'
+    to 'vic.ivanoff@gmail.com'
+    from 'RelateIQ integration robot <integration@domain.com>'
+    subject 'Weekly RelateIQ email'
+    text_part do
+      companies_text = companies.length > 1 ? "#{companies.length} companies were" : "one company was"
+      email = "This week #{companies_text} successfully added to RelateIQ via CBinsights sweep:\n"
+      companies.each_with_index do |c, i|
+        email << c.to_email(i+1)
+      end
+      body email
+    end
+  end
 
 end
 
@@ -124,7 +144,7 @@ end
 def error_email(errors)
   begin
     Mail.deliver do
-      to 'taylor.k.f@gmail.com'
+     # to 'taylor.k.f@gmail.com'
       to 'vic.ivanoff@gmail.com'
       from 'RelateIQ integration robot <integration@domain.com>'
       subject 'Something went wrong with the CBInsights email'
