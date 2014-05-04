@@ -61,7 +61,7 @@ get '/' do
   'RelateIQ integration example'
 end
 
-get '/weekly' do
+post '/weekly' do
   weekly_email
 end
 
