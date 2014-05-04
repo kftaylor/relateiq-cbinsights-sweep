@@ -1,6 +1,6 @@
 class Company
   attr_accessor   :report_name, :name, :sector, :url, :description,
-                  :round, :amount, :investors, :date
+                  :round, :amount, :investors, :date, :created_at
 
   def initialize(row = nil)
     parse_row(row) if row
@@ -15,6 +15,7 @@ class Company
     @amount = (row['Amount'].to_f) if row['Amount'] && !row['Amount'].empty?
     @investors = row['Investors']
     @date = Date.parse(row['Date']) if row['Date'] && !row['Date'].empty?
+    @created_at = Date.today
   end
 
   def round=(round)
@@ -57,7 +58,6 @@ class Company
     end
     ]
     attrs.delete :sector
-    attrs[:created_at] = Date.today
     emails.insert(attrs)
   end
 
