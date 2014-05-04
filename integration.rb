@@ -86,7 +86,7 @@ end
 
 def success_email(report_name, companies)
   Mail.deliver do
-    #to 'taylor.k.f@gmail.com'
+    to 'taylor.k.f@gmail.com'
     to 'vic.ivanoff@gmail.com'
     from 'RelateIQ integration robot <integration@domain.com>'
     subject 'Just got one more CBInsights email'
@@ -109,6 +109,7 @@ def admin_error_email e
   begin
     Mail.deliver do
       to 'vic.ivanoff@gmail.com'
+      to 'taylor.k.f@gmail.com'
       from 'RelateIQ integration robot <integration@domain.com>'
       subject 'Something went wrong with the CBInsights email'
       text_part do
@@ -123,7 +124,7 @@ end
 def error_email(errors)
   begin
     Mail.deliver do
-      #to 'taylor.k.f@gmail.com'
+      to 'taylor.k.f@gmail.com'
       to 'vic.ivanoff@gmail.com'
       from 'RelateIQ integration robot <integration@domain.com>'
       subject 'Something went wrong with the CBInsights email'
