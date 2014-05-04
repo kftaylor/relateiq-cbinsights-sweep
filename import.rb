@@ -1,0 +1,59 @@
+class Import
+
+  attr_accessor :report_name, :list_id, :csv
+
+  def initialize(report_name, list_id, csv)
+    @report_name = report_name
+    @list_id = list_id
+    @csv = csv
+  end
+
+  def process_csv
+    @list = RelateIQ::List.find(@list_id)
+    failed = []
+    parsed = []
+    CSV.new(@csv, :headers => true).each do |row|
+      begin
+        company = Company.new row
+        next if company.is_too_old?
+        company.report_name = @report_name
+        create_account_and_list_item(company)
+        company.to_db(DB[:companies])
+        parsed << company
+      rescue => e
+        failed << {company: company.name, error: e.message}
+      end
+    end
+    [parsed, failed]
+  end
+
+  def create_account(company)
+    acc = RelateIQ::Account.new
+    acc.create(name: company.name)
+    acc
+  end
+
+  def create_account_and_list_item(company)
+    acc = create_account(company)
+
+    fields = company.relate_iq_fields(@list)
+    list_attrs = {
+        :accountId => acc.id,
+        :listId => list.id,
+        :name => acc.name,
+        :contactIds => [''],
+        :fieldValues => Hash[fields]
+    }
+    RelateIQ.post("lists/#{@list.id}/listitems", list_attrs.to_json)
+  end
+
+
+  def to_db(db)
+    db.insert(
+        :report_name => @report_name,
+        :created_at => Date.today,
+        :csv_content => @csv,
+    )
+  end
+
+end

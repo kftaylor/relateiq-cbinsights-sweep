@@ -1,5 +1,8 @@
 #encoding: utf-8
 require 'csv'
+require 'date'
+require './company'
+require './import'
 
 configure do
   RelateIQ.configure(
@@ -21,27 +24,33 @@ configure do
     }
   end
 
-  #DB = Sequel.connect(ENV["DATABASE_URL"])
+  DB = Sequel.connect(ENV["DATABASE_URL"])
   #
   ##schema
-  #DB.create_table? :items do
-  #  primary_key :id
-  #  String :name
-  #  Float :amount
-  #  Date :date
-  #  Date :created_at
-  #  String :round
-  #  String :csv_content
-  #end
-  #items = DB[:items]
-  #
-  #DB.create_table? :imports do
-  #  primary_key :id
-  #  Date :date
-  #  String :csv_content
-  #  String :error_message
-  #end
-  #imports = DB[:imports]
+
+  DB.create_table? :imports do
+    primary_key  :id
+    String       :report_name
+    Date         :date
+    String       :csv_content
+    String       :error_message
+    Date         :created_at
+  end
+  imports = DB[:imports]
+
+  DB.create_table? :companies do
+    primary_key  :id
+    String       :report_name
+    String       :name
+    String       :url
+    String       :description
+    String       :round
+    Float        :amount
+    String       :investors
+    Date         :date
+  end
+  companies = DB[:companies]
+
 end
 
 before do
@@ -62,9 +71,11 @@ post '/' do
         (name = params['attachment-1'][:filename])
       status 200
     end
-    parsed, failed = import_csv(tmpfile.read, '535b4d8fe4b082b80fbf0618')
+    import = Import.new(report_name, '535b4d8fe4b082b80fbf0618', tmpfile.read)
+    parsed, failed = import.process_csv
     success_email(report_name, parsed) if !parsed.empty?
     error_email(failed) if !failed.empty?
+    import.to_db(imports)
     status 201
   rescue => e
     logger.error e
@@ -73,67 +84,21 @@ post '/' do
   end
 end
 
-def create_account_and_list_item(row, list)
-  acc = RelateIQ::Account.new
-  acc.create(name: row['Company'])
 
-  fields = row.headers.select do |key|
-    list.fields.find { |f| f['name'].downcase == key.downcase }
-  end.map do |key|
-    f = list.fields.find { |f| f['name'].downcase == key.downcase }
-    [f['id'], [{'raw' => row[key]}]]
-  end
-  fields << [0, [{'raw' => 0}]]
-
-  list_attrs = {
-      :accountId => acc.id,
-      :listId => list.id,
-      :name => acc.name,
-      :contactIds => [''],
-      :fieldValues => Hash[fields]
-  }
-  RelateIQ.post("lists/#{list.id}/listitems", list_attrs.to_json)
-
-end
-
-def import_csv(scv_string, list_id)
-  list = RelateIQ::List.find(list_id)
-  failed = []
-  parsed = []
-  CSV.new(scv_string, :headers => true).each do |row|
-    begin
-      create_account_and_list_item(row, list)
-      parsed << row
-    rescue => e
-      failed << {company: row['Company'], error: e.message}
-    end
-  end
-  [parsed, failed]
-end
-
-
-def success_email(report_name, rows)
+def success_email(report_name, companies)
   Mail.deliver do
     #to 'taylor.k.f@gmail.com'
     to 'vic.ivanoff@gmail.com'
     from 'RelateIQ integration robot <integration@domain.com>'
     subject 'Just got one more CBInsights email'
     text_part do
-      s = "#{rows.length} companies were successfully added to RelateIQ via CBinsights (#{report_name}) sweep:\n"
-      rows.each_with_index do |r, i|
-        desc = r['Company Description'].split('.').first if r['Company Description']
-        s << "#{i}. #{r['Company']}"
-        s << " - \"#{desc}\"" if desc
-        s << "\n  * "
-        s << "#{r['Round']}" if r['Round']
-        s << " ($#{r['Amount']}m)" if r['Amount']
-        s << " with #{r['Investors']}"  if r['Investors']
-        s << "\n"
+      email = "#{companies.length} companies were successfully added to RelateIQ via CBinsights (#{report_name}) sweep:\n"
+      companies.each_with_index do |c, i|
+        email << c.to_email(i)
       end
-      body s
+      body email
     end
   end
-
 end
 
 def weekly_email
