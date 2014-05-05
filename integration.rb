@@ -92,7 +92,7 @@ end
 def success_email(report_name, companies)
   Mail.deliver do
     to 'taylor.k.f@gmail.com'
-    to 'vic.ivanoff@gmail.com'
+    cc 'vic.ivanoff@gmail.com'
     from 'RelateIQ integration robot <integration@domain.com>'
     subject 'Just got one more CBInsights email'
     text_part do
@@ -110,7 +110,7 @@ def weekly_email
   companies = DB[:companies].where{created_at >= (Date.today - 7)}.all.map{|c| Company.from_db c}
   Mail.deliver do
     to 'taylor.k.f@gmail.com'
-    to 'vic.ivanoff@gmail.com'
+    cc 'vic.ivanoff@gmail.com'
     from 'RelateIQ integration robot <integration@domain.com>'
     subject 'Weekly RelateIQ email'
     text_part do
@@ -144,8 +144,8 @@ end
 def error_email(errors)
   begin
     Mail.deliver do
-     # to 'taylor.k.f@gmail.com'
-      to 'vic.ivanoff@gmail.com'
+      to 'taylor.k.f@gmail.com'
+      cc 'vic.ivanoff@gmail.com'
       from 'RelateIQ integration robot <integration@domain.com>'
       subject 'Something went wrong with the CBInsights email'
       text_part do
