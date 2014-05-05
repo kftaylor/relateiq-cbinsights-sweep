@@ -94,7 +94,7 @@ def success_email(report_name, companies)
     to 'taylor.k.f@gmail.com'
     cc 'vic.ivanoff@gmail.com'
     from 'RelateIQ integration robot <integration@domain.com>'
-    subject 'Just got one more CBInsights email'
+    subject "#{companies.length} relationship(s) added to RelateIQ via CBinsights"
     text_part do
       companies_text = companies.length > 1 ? "#{companies.length} companies were" : "One company was"
       email = "#{companies_text} successfully added to RelateIQ via CBinsights (#{report_name}) sweep:\n"
