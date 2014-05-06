@@ -32,6 +32,7 @@ class Company
     email << @round if @round
     email << " ($#{@amount}m)" if @amount > 0
     email << " with investors: #{@investors}" if @investors
+    email << ". Funding date: #{date}" if self.is_too_old?
     email << "\n"
     email
   end

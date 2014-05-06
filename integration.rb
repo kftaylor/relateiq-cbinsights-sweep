@@ -76,8 +76,8 @@ post '/' do
       status 200
     end
     import = Import.new(report_name, '535b4d8fe4b082b80fbf0618', tmpfile.read)
-    parsed, failed = import.process_csv
-    success_email(report_name, parsed) if !parsed.empty?
+    parsed, failed, too_old = import.process_csv
+    success_email(report_name, parsed, too_old) if !parsed.empty?
     error_email(failed) if !failed.empty?
     import.to_db
     status 201
@@ -89,7 +89,7 @@ post '/' do
 end
 
 
-def success_email(report_name, companies)
+def success_email(report_name, companies, too_old)
   Mail.deliver do
     to 'taylor.k.f@gmail.com'
     cc 'vic.ivanoff@gmail.com'
@@ -100,6 +100,15 @@ def success_email(report_name, companies)
       email = "#{companies_text} successfully added to RelateIQ via CBinsights (#{report_name}) sweep:\n"
       companies.each_with_index do |c, i|
         email << c.to_email(i+1)
+      end
+      if too_old.length > 0
+        deals = too_old.length == 1 ? '1 deal was' : "#{too_old.length} deals were"
+        email << "\n #{deals} excluded due to a finding date:\n"
+
+        too_old.each_with_index do |c, i|
+          email << c.to_email(i+1)
+        end
+
       end
       body email
     end
