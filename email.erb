@@ -20,7 +20,7 @@
           <%= companies_text %> successfully added to RelateIQ via CBinsights <%= report_name %> sweep:</p>
         <ol style="margin:0;padding:0;margin-bottom: 10px;font-weight: normal;font-size: 14px;">
           <% companies.each do |c| %>
-            <li style=" margin-left: 5px;list-style-position: inside;">
+            <li style=" margin-left: 5px;list-style-position: inside; margin-bottom:10px">
               <a style="color: #348eda;" href="<%= c.url %>"><%= c.name %></a>
               <% if c.description %>
                 — <i> &quot;<%= c.description %>.&quot; </i>
@@ -43,7 +43,7 @@
           </p>
           <ol style="margin:0;padding:0;margin-bottom: 10px;font-weight: normal;font-size: 14px;">
             <% too_old.each do |c| %>
-              <li style=" margin-left: 5px;list-style-position: inside;">
+              <li style=" margin-left: 5px;list-style-position: inside; margin-bottom:10px">
                 <a style="color: #348eda;" href="<%= c.url %>"><%= c.name %></a>. Funding date: <%=c.date%>
               </li>
             <% end %>
