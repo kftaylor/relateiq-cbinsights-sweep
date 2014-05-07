@@ -1,6 +1,7 @@
 #encoding: utf-8
 require 'csv'
 require 'date'
+require 'erb'
 require './company'
 require './import'
 
@@ -111,6 +112,10 @@ def success_email(report_name, companies, too_old)
 
       end
       body email
+    end
+    html_part do
+      template = ERB.new(File.read("email.erb"))
+      body template.result(binding)
     end
   end
 end

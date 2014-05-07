@@ -10,7 +10,7 @@ class Company
     @description = row['Company Description'].split('.').first if row['Company Description']
     @name = row['Company']
     @sector = row['Sector']
-    @url = row['Company URL']
+    @url = row['URL']
     self.round = row['Round']
     @amount = (row['Amount'].to_f) if row['Amount'] && !row['Amount'].empty?
     @investors = row['Investors']
@@ -27,8 +27,9 @@ class Company
   def to_email(index = nil)
     email = ""
     email << (index ? "#{index}. #{@name}" : @name)
+    email << " (#{@url})" if @url
     email << " - \"#{@description}\"" if @description
-    email << "\n  * "
+    email << "\n   "
     email << @round if @round
     email << " ($#{@amount}m)" if @amount > 0
     email << " with investors: #{@investors}" if @investors
