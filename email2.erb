@@ -15,8 +15,9 @@
     <!-- BEGIN TEMPLATE // -->
     <table border="0" cellpadding="0" cellspacing="0" id="templateContainer" style="-webkit-text-size-adjust: none !important; -ms-text-size-adjust: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-collapse: collapse !important; width: 100% !important; max-width: 600px !important; border: 1px solid #bbbbbb;"><tr><td align="center" valign="top" style="-webkit-text-size-adjust: none !important; -ms-text-size-adjust: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt;">
       <!-- BEGIN PREHEADER // -->
+      <% companies_text = companies.length > 1 ? "<strong>#{companies.length}</strong> companies were" : "<strong>One</strong> company was" %>
       <table border="0" cellpadding="0" cellspacing="0" width="100%" id="templatePreheader" style="-webkit-text-size-adjust: none !important; -ms-text-size-adjust: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-collapse: collapse !important; border-bottom-color: #CCCCCC; border-bottom-width: 1px; border-bottom-style: solid; display: none !important; background-color: #F4F4F4;" bgcolor="#F4F4F4"><tr><td valign="top" class="preheaderContent" style="-webkit-text-size-adjust: none !important; -ms-text-size-adjust: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt; color: #808080; font-family: Helvetica; font-size: 10px; line-height: 125%; text-align: left; padding: 10px 20px;" mc:edit="preheader_content00" align="left">
-        Use this area to offer a short teaser of your email's content. Text here will show in the preview area of some email clients.
+        <%= companies_text %> successfully added to RelateIQ via CBInsights <%= report_name %> sweep.
       </td>
       </tr></table><!-- // END PREHEADER --></td>
     </tr><tr><td align="center" valign="top" style="-webkit-text-size-adjust: none !important; -ms-text-size-adjust: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt;">
@@ -24,9 +25,9 @@
     </tr><tr><td align="center" valign="top" style="-webkit-text-size-adjust: none !important; -ms-text-size-adjust: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt;">
       <!-- BEGIN BODY // -->
       <table border="0" cellpadding="0" cellspacing="0" width="100%" id="templateBody" style="-webkit-text-size-adjust: none !important; -ms-text-size-adjust: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-collapse: collapse !important; border-top-width: 1px; border-top-color: #FFFFFF; border-top-style: solid; border-bottom-width: 1px; border-bottom-color: #CCCCCC; border-bottom-style: solid; background-color: #F4F4F4;" bgcolor="#F4F4F4"><tr><td valign="top" class="bodyContent" mc:edit="body_content" style="-webkit-text-size-adjust: none !important; -ms-text-size-adjust: 100%; mso-table-lspace: 0pt; mso-table-rspace: 0pt; color: #505050; font-family: Helvetica; font-size: 18px !important; line-height: 125% !important; text-align: left; padding: 20px;" align="left">
-        <% companies_text = companies.length > 1 ? "<strong>#{companies.length}</strong> companies were" : "<strong>One</strong> company was" %>
+
         <p style="margin-bottom: 10px;font-weight: normal;font-size: 14px;">
-          <%= companies_text %> successfully added to RelateIQ via CBinsights <%= report_name %> sweep:</p>
+          <%= companies_text %> successfully added to RelateIQ via CBInsights <%= report_name %> sweep:</p>
         <ol style="margin:0;padding:0;margin-bottom: 10px;font-weight: normal;font-size: 14px;">
           <% companies.each do |c| %>
             <li style=" margin-left: 5px;list-style-position: inside; margin-bottom:10px">
