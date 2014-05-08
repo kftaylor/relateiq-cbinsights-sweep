@@ -14,6 +14,7 @@ class Company
     self.round = row['Round']
     @amount = (row['Amount'].to_f) if row['Amount'] && !row['Amount'].empty?
     @investors = row['Investors']
+    @city = row['City']
     @date = Date.parse(row['Date']) if row['Date'] && !row['Date'].empty?
     @created_at = Date.today
   end
