@@ -20,7 +20,6 @@ configure do
         :address => ENV['MAILGUN_SMTP_SERVER'],
         :user_name => ENV['MAILGUN_SMTP_LOGIN'],
         :password => ENV['MAILGUN_SMTP_PASSWORD'],
-        :domain => 'fileshare2.herokuapp.com',
         :authentication => :plain,
     }
   end
@@ -95,7 +94,6 @@ def success_email(report_name, companies, too_old)
     to 'taylor.k.f@gmail.com'
     cc 'vic.ivanoff@gmail.com'
     from 'RelateIQ integration robot <integration@domain.com>'
-    charset 'UTF-8'
     subject "#{companies.length} relationship(s) added to RelateIQ via CBInsights"
     text_part do
       companies_text = companies.length > 1 ? "#{companies.length} companies were" : 'One company was'
@@ -132,7 +130,6 @@ def weekly_email
     cc 'vic.ivanoff@gmail.com'
     from 'RelateIQ integration robot <integration@domain.com>'
     subject 'Weekly RelateIQ email'
-    charset 'UTF-8'
     text_part do
       companies_text = companies.length > 1 ? "#{companies.length} companies were" : 'one company was'
       email = "This week #{companies_text} successfully added to RelateIQ via CBinsights sweep:\n"
@@ -154,11 +151,11 @@ end
 
 def admin_error_email e
   begin
+    logger.error e.message
     Mail.deliver do
       to 'vic.ivanoff@gmail.com'
       from 'RelateIQ integration robot <integration@domain.com>'
       subject 'Something went wrong with the CBInsights email'
-      charset 'UTF-8'
       text_part do
         body "Sinatra couldn't process the request, error: #{e.message} \n"
       end
