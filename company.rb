@@ -1,6 +1,6 @@
 class Company
   attr_accessor   :report_name, :name, :sector, :url, :description,
-                  :round, :amount, :investors, :date, :created_at
+                  :round, :amount, :investors, :city, :date, :created_at
 
   def initialize(row = nil)
     parse_row(row) if row
