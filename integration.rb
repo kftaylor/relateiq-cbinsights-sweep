@@ -25,7 +25,7 @@ configure do
     }
   end
 
-  DB = Sequel.connect(ENV["DATABASE_URL"])
+  DB = Sequel.connect(ENV['DATABASE_URL'])
   #
   ##schema
 
@@ -95,16 +95,17 @@ def success_email(report_name, companies, too_old)
     to 'taylor.k.f@gmail.com'
     cc 'vic.ivanoff@gmail.com'
     from 'RelateIQ integration robot <integration@domain.com>'
-    subject "#{companies.length} relationship(s) added to RelateIQ via CBinsights"
+    charset 'UTF-8'
+    subject "#{companies.length} relationship(s) added to RelateIQ via CBInsights"
     text_part do
-      companies_text = companies.length > 1 ? "#{companies.length} companies were" : "One company was"
-      email = "#{companies_text} successfully added to RelateIQ via CBinsights (#{report_name}) sweep:\n"
+      companies_text = companies.length > 1 ? "#{companies.length} companies were" : 'One company was'
+      email = "#{companies_text} successfully added to RelateIQ via CBInsights (#{report_name}) sweep:\n"
       companies.each_with_index do |c, i|
         email << c.to_email(i+1)
       end
       if too_old.length > 0
         deals = too_old.length == 1 ? '1 deal was' : "#{too_old.length} deals were"
-        email << "\n #{deals} excluded due to a finding date:\n"
+        email << "\n #{deals} excluded due to a funding date:\n"
 
         too_old.each_with_index do |c, i|
           email << c.to_email(i+1)
@@ -114,8 +115,12 @@ def success_email(report_name, companies, too_old)
       body email
     end
     html_part do
-      template = ERB.new(File.read("email.erb"))
-      body template.result(binding)
+      layout = Tilt.new('layout.erb')
+      email_partial = Tilt.new('email.erb')
+      html = layout.render do
+        email_partial.render(nil, companies:companies, too_old: too_old, report_name:report_name)
+      end
+      body html
     end
   end
 end
@@ -127,25 +132,33 @@ def weekly_email
     cc 'vic.ivanoff@gmail.com'
     from 'RelateIQ integration robot <integration@domain.com>'
     subject 'Weekly RelateIQ email'
+    charset 'UTF-8'
     text_part do
-      companies_text = companies.length > 1 ? "#{companies.length} companies were" : "one company was"
+      companies_text = companies.length > 1 ? "#{companies.length} companies were" : 'one company was'
       email = "This week #{companies_text} successfully added to RelateIQ via CBinsights sweep:\n"
       companies.each_with_index do |c, i|
         email << c.to_email(i+1)
       end
       body email
     end
+    html_part do
+      layout = Tilt.new('layout.erb')
+      weekly_email_partial = Tilt.new('weekly_email.erb')
+      html = layout.render do
+        weekly_email_partial.render(nil, companies: companies)
+      end
+      body html
+    end
   end
-
 end
 
 def admin_error_email e
   begin
     Mail.deliver do
       to 'vic.ivanoff@gmail.com'
-      to 'taylor.k.f@gmail.com'
       from 'RelateIQ integration robot <integration@domain.com>'
       subject 'Something went wrong with the CBInsights email'
+      charset 'UTF-8'
       text_part do
         body "Sinatra couldn't process the request, error: #{e.message} \n"
       end
@@ -163,7 +176,7 @@ def error_email(errors)
       from 'RelateIQ integration robot <integration@domain.com>'
       subject 'Something went wrong with the CBInsights email'
       text_part do
-        s = "RelateIQ API application failed to accept CBinsights CSV. This error was received: \n"
+        s = "RelateIQ API application failed to accept CBInsights CSV. This error was received: \n"
         errors.each do |e|
           s << "Company: #{e[:company]}. Error: #{e[:error]} \n"
         end
