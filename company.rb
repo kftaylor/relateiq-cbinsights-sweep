@@ -3,24 +3,26 @@ class Company
                   :round, :amount, :investors, :city, :date, :created_at
 
   def initialize(row = nil)
+    @data = Hash.new
     parse_row(row) if row
   end
 
   def parse_row(row)
-    @description = row['Company Description'].split('.').first if row['Company Description']
     @name = row['Company']
-    @sector = row['Sector']
-    @url = row['URL']
-    self.round = row['Round']
-    @amount = (row['Amount'].to_f) if row['Amount'] && !row['Amount'].empty?
-    @investors = row['Investors']
-    @city = row['City']
     @date = Date.parse(row['Date']) if row['Date'] && !row['Date'].empty?
     @created_at = Date.today
+    row.each do |pair|
+      @data[pair.first.downcase] = pair.last
+    end
+    @data['round'] = preprocess_round(@data['round'])
   end
 
-  def round=(round)
-    @round = %w(Angel Seed).find do |r|
+  def get(key)
+    @data[key]
+  end
+
+  def preprocess_round(round)
+    %w(Angel Seed).find do |r|
       round.downcase.include?(r.downcase)
     end || round
   end
@@ -28,13 +30,13 @@ class Company
   def to_email(index = nil)
     email = ""
     email << (index ? "#{index}. #{@name}" : @name)
-    email << " (#{@url})" if @url
-    email << " - \"#{@description}\"" if @description
+    email << " (#{url})" if url
+    email << " - \"#{company_description}\"" if company_description
     email << "\n   "
-    email << @round if @round
-    email << " ($#{@amount}m)" if @amount > 0
-    email << " with investors: #{@investors}" if @investors
-    email << ". Funding date: #{date}" if self.is_too_old?
+    email << round unless round.empty?
+    email << " ($#{amount}m)" if amount.to_f > 0
+    email << " with investors: #{investors.split(';').join(', ')}" if investors
+    email << ". Funding date: #{@date}" if self.is_too_old?
     email << "\n"
     email
   end
@@ -56,19 +58,25 @@ class Company
   end
 
   def to_db(emails)
-    attrs = Hash[ self.instance_variables.map do |ivar|
-      [ivar.to_s.sub('@', '').to_sym, self.instance_variable_get(ivar)]
-    end
-    ]
-    attrs.delete :sector
-    attrs.delete :city
+    attrs = {
+        :name => @name,
+        :created_at => @created_at,
+        :date => @date,
+        :data => Sequel.hstore(@data)
+    }
     emails.insert(attrs)
   end
 
   def self.from_db(attrs)
     company = self.new
-    attrs.delete(:id)
-    attrs.each { |k,v| company.send("#{k}=", v) }
+    %w(name date created_at data).each {|attr| company.send(attr+'=', attrs[attr.to_sym])}
     company
+  end
+
+  def method_missing(method, *args, &block)
+    return @data[method.to_s] if @data[method.to_s]
+    key = method.to_s.split('_').join(' ')
+    return @data[key] if @data[key]
+    super
   end
 end

@@ -5,15 +5,15 @@
   <% companies.each do |company| %>
     <li style=" margin-left: 5px;list-style-position: inside; margin-bottom:10px">
       <a style="color: #348eda;" href="<%= company.url %>"><%= company.name %></a>
-      <% if company.description %>
-        — <i> &quot;<%= company.description %>.&quot; </i>
+      <% if company.company_description && !company.company_description %>
+        — <i> &quot;<%= company.company_description %>.&quot; </i>
       <% end %>
       <br>
       <%= company.round %>
-      <% if company.amount%>
-        ($<%=company.amount%>m)
+      <% if company.amount && !company.amount.empty? %>
+        ($<%= company.amount %>m)
       <% end %>
-      <% if company.investors %>
+      <% if company.investors && !company.investors.empty? %>
         — <%= company.investors.split(';').join(', ') %>
       <% end %>
     </li>
@@ -27,7 +27,7 @@
   <ol style="margin-bottom: 10px;font-weight: normal;font-size: 14px;">
     <% too_old.each do |company| %>
       <li style=" margin-left: 5px;list-style-position: inside; margin-bottom:10px">
-        <a style="color: #348eda;" href="<%= company.url %>"><%= company.name %></a>. Funding date: <%=company.date%>
+        <a style="color: #348eda;" href="<%= company.url %>"><%= company.name %></a>. Funding date: <%= company.date %>
       </li>
     <% end %>
   </ol>

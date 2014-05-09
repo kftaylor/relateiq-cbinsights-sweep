@@ -5,6 +5,7 @@ gem 'json'
 gem 'relateiq', :github => 'ivanovv/relateiq'
 gem 'pg'
 gem 'sequel'
+gem 'sequel_pg', :require=>'sequel'
 gem 'mail'
 gem 'unicorn'
 

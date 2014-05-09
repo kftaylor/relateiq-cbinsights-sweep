@@ -4,6 +4,8 @@ require 'date'
 require 'erb'
 require './company'
 require './import'
+require 'sequel/extensions/pg_hstore'
+
 
 configure do
   RelateIQ.configure(
@@ -23,7 +25,7 @@ configure do
         :authentication => :plain,
     }
   end
-
+  Sequel.extension(:pg_hstore, :pg_hstore_ops, :pg_array)
   DB = Sequel.connect(ENV['DATABASE_URL'])
   #
   ##schema
@@ -39,22 +41,15 @@ configure do
 
   DB.create_table? :companies do
     primary_key  :id
-    String       :report_name
     String       :name
-    String       :url
-    String       :description
-    String       :round
-    Float        :amount
-    String       :investors
     Date         :date
     Date         :created_at
+    HStore       :data
   end
-  companies = DB[:companies]
-
 end
 
 before do
-  #settings.zendesk_client.config.logger ||= logger
+  # do something before every request
 end
 
 get '/' do
@@ -104,11 +99,9 @@ def success_email(report_name, companies, too_old)
       if too_old.length > 0
         deals = too_old.length == 1 ? '1 deal was' : "#{too_old.length} deals were"
         email << "\n #{deals} excluded due to a funding date:\n"
-
         too_old.each_with_index do |c, i|
           email << c.to_email(i+1)
         end
-
       end
       body email
     end
@@ -149,7 +142,7 @@ def weekly_email
   end
 end
 
-def admin_error_email e
+def admin_error_email(e)
   begin
     logger.error e.message
     Mail.deliver do
@@ -160,8 +153,8 @@ def admin_error_email e
         body "Sinatra couldn't process the request, error: #{e.message} \n"
       end
     end
-  rescue
-    #empty
+  rescue => error
+    logger.error error.message
   end
 end
 
@@ -180,7 +173,7 @@ def error_email(errors)
         body s
       end
     end
-  rescue
-    #empty
+  rescue => error
+    logger.error error.message
   end
 end
