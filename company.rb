@@ -14,6 +14,7 @@ class Company
       @data[pair.first.downcase] = pair.last
     end
     @data['round'] = preprocess_round(@data['round'])
+    @data['company description'] = @data['company description'].split('.').first if @data['company description']
     @data['description'] = @data['company description']
   end
 
