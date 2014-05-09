@@ -7,28 +7,21 @@ class Company
   end
 
   def parse_row(row)
-    @description = row['Company Description'].split('.').first if row['Company Description']
     @name = row['Company']
-    @sector = row['Sector']
-    @url = row['URL']
-    self.round = row['Round']
-    @amount = (row['Amount'].to_f) if row['Amount'] && !row['Amount'].empty?
-    @investors = row['Investors']
-    @city = row['City']
     @date = Date.parse(row['Date']) if row['Date'] && !row['Date'].empty?
     @created_at = Date.today
     row.each do |pair|
-      @data[pair.first.downcase.gsub(' ', '_')] = pair.last
+      @data[pair.first.downcase] = pair.last
     end
-
+    data['round'] = preprocess_round(data['round'])
   end
 
   def get(key)
     @data[key]
   end
 
-  def round=(round)
-    @round = %w(Angel Seed).find do |r|
+  def preprocess_round(round)
+    %w(Angel Seed).find do |r|
       round.downcase.include?(r.downcase)
     end || round
   end
@@ -36,13 +29,13 @@ class Company
   def to_email(index = nil)
     email = ""
     email << (index ? "#{index}. #{@name}" : @name)
-    email << " (#{@url})" if @url
+    email << " (#{url})" if url
     email << " - \"#{@description}\"" if @description
     email << "\n   "
-    email << @round if @round
-    email << " ($#{@amount}m)" if @amount > 0
-    email << " with investors: #{@investors}" if @investors
-    email << ". Funding date: #{date}" if self.is_too_old?
+    email << round unless round.empty?
+    email << " ($#{amount}m)" if amount.to_i > 0
+    email << " with investors: #{investors}" if investors
+    email << ". Funding date: #{@date}" if self.is_too_old?
     email << "\n"
     email
   end
