@@ -1,6 +1,5 @@
 class Company
-  attr_accessor   :report_name, :name, :sector, :url, :description,
-                  :round, :amount, :investors, :city, :date, :created_at
+  attr_accessor   :name, :data, :date, :created_at
 
   def initialize(row = nil)
     @data = Hash.new
@@ -15,6 +14,7 @@ class Company
       @data[pair.first.downcase] = pair.last
     end
     @data['round'] = preprocess_round(@data['round'])
+    @data['description'] = @data['company description']
   end
 
   def get(key)
@@ -33,8 +33,8 @@ class Company
     email << " (#{url})" if url
     email << " - \"#{company_description}\"" if company_description
     email << "\n   "
-    email << round unless round.empty?
-    email << " ($#{amount}m)" if amount.to_f > 0
+    email << round if (round && !round.empty?)
+    email << " ($#{amount}m)" if (amount && amount.to_f > 0)
     email << " with investors: #{investors.split(';').join(', ')}" if investors
     email << ". Funding date: #{@date}" if self.is_too_old?
     email << "\n"
@@ -47,12 +47,12 @@ class Company
 
 
   def relate_iq_fields(list)
-    keys = self.instance_variables.map{ |a| a.to_s.downcase.sub('@', '')}
+    keys = @data.keys
     fields = keys.select do |key|
       list.fields.find { |f| f['name'].downcase == key }
     end.map do |key|
       f = list.fields.find { |f| f['name'].downcase == key }
-      [f['id'], [{'raw' => self.send(key).to_s}]]
+      [f['id'], [{'raw' => @data[key.to_s]}]]
     end
     fields << [0, [{'raw' => 0}]]
   end
