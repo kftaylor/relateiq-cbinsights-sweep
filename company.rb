@@ -61,6 +61,7 @@ class Company
     end
     ]
     attrs.delete :sector
+    attrs.delete :city
     emails.insert(attrs)
   end
 
