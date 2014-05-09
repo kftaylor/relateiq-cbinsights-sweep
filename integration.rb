@@ -109,7 +109,7 @@ def success_email(report_name, companies, too_old)
       layout = Tilt.new('layout.erb')
       email_partial = Tilt.new('email.erb')
       html = layout.render do
-        email_partial.render(nil, companies:companies, too_old: too_old, report_name:report_name)
+        email_partial.render(nil, companies: companies, too_old: too_old, report_name: report_name)
       end
       body html
     end

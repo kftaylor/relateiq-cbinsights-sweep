@@ -20,7 +20,6 @@ class Import
           too_old << company
           next
         end
-        company.report_name = @report_name
         create_account_and_list_item(company)
         company.to_db(DB[:companies])
         parsed << company
