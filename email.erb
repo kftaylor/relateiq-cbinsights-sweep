@@ -5,7 +5,7 @@
   <% companies.each do |company| %>
     <li style=" margin-left: 5px;list-style-position: inside; margin-bottom:10px">
       <a style="color: #348eda;" href="<%= company.url %>"><%= company.name %></a>
-      <% if company.company_description && !company.company_description %>
+      <% if company.company_description && !company.company_description.empty? %>
         — <i> &quot;<%= company.company_description %>.&quot; </i>
       <% end %>
       <br>
