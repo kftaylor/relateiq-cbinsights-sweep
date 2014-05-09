@@ -1,8 +1,8 @@
 class Company
-  attr_accessor   :report_name, :name, :sector, :url, :description,
-                  :round, :amount, :investors, :city, :date, :created_at
+  attr_accessor   :name, :date, :created_at
 
   def initialize(row = nil)
+    @data = Hash.new
     parse_row(row) if row
   end
 
@@ -17,6 +17,14 @@ class Company
     @city = row['City']
     @date = Date.parse(row['Date']) if row['Date'] && !row['Date'].empty?
     @created_at = Date.today
+    row.each do |pair|
+      @data[pair.first.downcase.gsub(' ', '_')] = pair.last
+    end
+
+  end
+
+  def get(key)
+    @data[key]
   end
 
   def round=(round)
@@ -69,5 +77,10 @@ class Company
     attrs.delete(:id)
     attrs.each { |k,v| company.send("#{k}=", v) }
     company
+  end
+
+  def method_missing(method, *args, &block)
+    return @data[method] if @data[method]
+    super
   end
 end
