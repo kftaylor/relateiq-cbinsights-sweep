@@ -88,7 +88,7 @@ def success_email(report_name, companies, too_old)
   Mail.deliver do
     to 'taylor.k.f@gmail.com'
     cc 'vic.ivanoff@gmail.com'
-    from 'RelateIQ integration robot <integration@domain.com>'
+    from 'RelateIQ Robot <integration@domain.com>'
     subject "#{companies.length} relationship(s) added to RelateIQ via CBInsights"
     text_part do
       companies_text = companies.length > 1 ? "#{companies.length} companies were" : 'One company was'
@@ -121,7 +121,7 @@ def weekly_email
   Mail.deliver do
     to 'taylor.k.f@gmail.com'
     cc 'vic.ivanoff@gmail.com'
-    from 'RelateIQ integration robot <integration@domain.com>'
+    from 'RelateIQ Robot <integration@domain.com>'
     subject 'Weekly RelateIQ email'
     text_part do
       companies_text = companies.length > 1 ? "#{companies.length} companies were" : 'one company was'
@@ -147,7 +147,7 @@ def admin_error_email(e)
     logger.error e.message
     Mail.deliver do
       to 'vic.ivanoff@gmail.com'
-      from 'RelateIQ integration robot <integration@domain.com>'
+      from 'RelateIQ Robot <integration@domain.com>'
       subject 'Something went wrong with the CBInsights email'
       text_part do
         body "Sinatra couldn't process the request, error: #{e.message} \n"
@@ -163,7 +163,7 @@ def error_email(errors)
     Mail.deliver do
       to 'taylor.k.f@gmail.com'
       cc 'vic.ivanoff@gmail.com'
-      from 'RelateIQ integration robot <integration@domain.com>'
+      from 'RelateIQ Robot <integration@domain.com>'
       subject 'Something went wrong with the CBInsights email'
       text_part do
         s = "RelateIQ API application failed to accept CBInsights CSV. This error was received: \n"
