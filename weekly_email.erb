@@ -2,19 +2,19 @@
 <p style="margin-bottom: 10px;font-weight: normal;font-size: 14px;">
   This week <%= companies_text %> successfully added to RelateIQ via CBInsights sweep:</p>
 <ol style="margin:0;padding:0;margin-bottom: 10px;font-weight: normal;font-size: 14px;">
-  <% companies.each do |c| %>
+  <% companies.each do |company| %>
     <li style=" margin-left: 5px;list-style-position: inside; margin-bottom:10px">
-      <a style="color: #348eda;" href="<%= c.url %>"><%= c.name %></a>
-      <% if c.description %>
-        — <i> &quot;<%= c.description %>.&quot; </i>
+      <a style="color: #348eda;" href="<%= company.url %>"><%= company.name %></a>
+      <% if company.company_description %>
+        — <i> &quot;<%= company.company_description %>.&quot; </i>
       <% end %>
       <br>
-      <%= c.round %>
-      <% if c.amount%>
-        ($<%=c.amount%>m)
+      <%= company.round %>
+      <% if company.amount && !company.amount.empty? %>
+        ($<%=company.amount%>m)
       <% end %>
-      <% if c.investors %>
-        — <%= c.investors.split(';').join(', ') %>
+      <% if company.investors && !company.investors.empty? %>
+        — <%= company.investors.split(';').join(', ') %>
       <% end %>
     </li>
   <% end %>
