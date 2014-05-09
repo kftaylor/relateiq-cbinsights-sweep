@@ -23,7 +23,7 @@ configure do
         :authentication => :plain,
     }
   end
-
+  Sequel.extension(:pg_hstore, :pg_hstore_ops, :pg_array)
   DB = Sequel.connect(ENV['DATABASE_URL'])
   #
   ##schema
