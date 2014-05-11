@@ -10,25 +10,26 @@ class Import
 
   def process_csv
     @list = RelateIQ::List.find(@list_id)
-    failed = []
-    parsed = []
-    too_old = []
+    result =  ImportResult.new
     CSV.new(@csv, :headers => true).each do |row|
       begin
         company = Company.new row
         if company.is_too_old?
-          too_old << company
+          result.too_old << company
           next
         end
-        next if exists(company)
+        if exists(company)
+          result.already_exists << company
+          next
+        end
         create_account_and_list_item(company)
         company.to_db(DB[:companies])
-        parsed << company
+        result.parsed << company
       rescue => e
-        failed << {company: company.name, error: e.message}
+        result.failed << {company: company.name, error: e.message}
       end
     end
-    [parsed, failed, too_old]
+    result
   end
 
   def create_account(company)

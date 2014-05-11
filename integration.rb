@@ -4,6 +4,7 @@ require 'date'
 require 'erb'
 require './company'
 require './import'
+require './import_result'
 require 'sequel/extensions/pg_hstore'
 
 
@@ -71,9 +72,9 @@ post '/' do
       status 200
     end
     import = Import.new(report_name, '535b4d8fe4b082b80fbf0618', tmpfile.read)
-    parsed, failed, too_old = import.process_csv
-    success_email(report_name, parsed, too_old) if !parsed.empty?
-    error_email(failed) if !failed.empty?
+    import_result = import.process_csv
+    success_email(report_name, import_result) if import_result.success?
+    error_email(import_result) if import_result.errors?
     import.to_db
     status 201
   rescue => e
@@ -84,11 +85,12 @@ post '/' do
 end
 
 
-def success_email(report_name, companies, too_old)
+def success_email(report_name, import_result)
+  companies =import_result.parsed
   Mail.deliver do
     to 'taylor.k.f@gmail.com'
     cc 'vic.ivanoff@gmail.com'
-    from 'RelateIQ Robot <integration@domain.com>'
+    from 'RelateIQ Robot <integration@relateiq-cbinsights-sweep.herokuapp.com>'
     subject "#{companies.length} relationship(s) added to RelateIQ via CBInsights"
     text_part do
       companies_text = companies.length > 1 ? "#{companies.length} companies were" : 'One company was'
@@ -96,11 +98,12 @@ def success_email(report_name, companies, too_old)
       companies.each_with_index do |c, i|
         email << c.to_email(i+1)
       end
-      if too_old.length > 0
+      if import_result.too_old.length > 0
+        too_old = import_result.too_old
         deals = too_old.length == 1 ? '1 deal was' : "#{too_old.length} deals were"
         email << "\n #{deals} excluded due to a funding date:\n"
-        too_old.each_with_index do |c, i|
-          email << c.to_email(i+1)
+        too_old.each_with_index do |company, i|
+          email << company.to_email(i+1)
         end
       end
       body email
@@ -109,7 +112,7 @@ def success_email(report_name, companies, too_old)
       layout = Tilt.new('layout.erb')
       email_partial = Tilt.new('email.erb')
       html = layout.render do
-        email_partial.render(nil, companies: companies, too_old: too_old, report_name: report_name)
+        email_partial.render(nil, import_result: import_result, report_name: report_name)
       end
       body html
     end
@@ -121,7 +124,7 @@ def weekly_email
   Mail.deliver do
     to 'taylor.k.f@gmail.com'
     cc 'vic.ivanoff@gmail.com'
-    from 'RelateIQ Robot <integration@domain.com>'
+    from 'RelateIQ Robot <integration@relateiq-cbinsights-sweep.herokuapp.com>'
     subject 'Weekly RelateIQ email'
     text_part do
       companies_text = companies.length > 1 ? "#{companies.length} companies were" : 'one company was'
@@ -147,7 +150,7 @@ def admin_error_email(e)
     logger.error e.message
     Mail.deliver do
       to 'vic.ivanoff@gmail.com'
-      from 'RelateIQ Robot <integration@domain.com>'
+      from 'RelateIQ Robot <integration@relateiq-cbinsights-sweep.herokuapp.com>'
       subject 'Something went wrong with the CBInsights email'
       text_part do
         body "Sinatra couldn't process the request, error: #{e.message} \n"
@@ -158,19 +161,19 @@ def admin_error_email(e)
   end
 end
 
-def error_email(errors)
+def error_email(import_result)
   begin
     Mail.deliver do
       to 'taylor.k.f@gmail.com'
       cc 'vic.ivanoff@gmail.com'
-      from 'RelateIQ Robot <integration@domain.com>'
+      from 'RelateIQ Robot <integration@relateiq-cbinsights-sweep.herokuapp.com>'
       subject 'Something went wrong with the CBInsights email'
       text_part do
-        s = "RelateIQ API application failed to accept CBInsights CSV. This error was received: \n"
-        errors.each do |e|
-          s << "Company: #{e[:company]}. Error: #{e[:error]} \n"
+        email = "RelateIQ API application failed to accept CBInsights CSV. This error was received: \n"
+        import_result.failed.each do |e|
+          email << "Company: #{e[:company]}. Error: #{e[:error]} \n"
         end
-        body s
+        body email
       end
     end
   rescue => error

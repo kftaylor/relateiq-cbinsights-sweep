@@ -1,3 +1,6 @@
+<% companies = import_result.parsed %>
+<% too_old = import_result.too_old %>
+<% already_exists = import_result.already_exists %>
 <% companies_text = companies.length > 1 ? "<strong>#{companies.length}</strong> companies were" : "<strong>One</strong> company was" %>
 <p style="margin-bottom: 10px;font-weight: normal;font-size: 14px;">
   <%= companies_text %> successfully added to RelateIQ via CBInsights <%= report_name %> sweep:</p>
@@ -31,4 +34,11 @@
       </li>
     <% end %>
   </ol>
+<% end %>
+
+<% if already_exists.length > 0 %>
+  <% already_exists = already_exists.length == 1 ? '<strong>One</strong>' : "<strong>#{already_exists.length}</strong>" %>
+  <p style="margin-bottom: 10px;font-weight: normal;font-size: 14px;">
+    <%= already_exists%> companies excluded due to existing relationship in RelateIQ
+  </p>
 <% end %>
