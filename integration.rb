@@ -86,7 +86,7 @@ end
 
 
 def success_email(report_name, import_result)
-  companies =import_result.parsed
+  companies = import_result.parsed
   Mail.deliver do
     to 'taylor.k.f@gmail.com'
     cc 'vic.ivanoff@gmail.com'

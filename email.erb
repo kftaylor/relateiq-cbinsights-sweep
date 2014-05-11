@@ -2,26 +2,28 @@
 <% too_old = import_result.too_old %>
 <% already_exists = import_result.already_exists %>
 <% companies_text = companies.length > 1 ? "<strong>#{companies.length}</strong> companies were" : "<strong>One</strong> company was" %>
-<p style="margin-bottom: 10px;font-weight: normal;font-size: 14px;">
-  <%= companies_text %> successfully added to RelateIQ via CBInsights <%= report_name %> sweep:</p>
-<ol style="margin:0;padding:0;margin-bottom: 10px;font-weight: normal;font-size: 14px;">
-  <% companies.each do |company| %>
-    <li style=" margin-left: 5px;list-style-position: inside; margin-bottom:10px">
-      <a style="color: #348eda;" href="<%= company.url %>"><%= company.name %></a>
-      <% if company.company_description && !company.company_description.empty? %>
-        — <i> &quot;<%= company.company_description %>.&quot; </i>
-      <% end %>
-      <br>
-      <%= company.round %>
-      <% if company.amount && !company.amount.empty? %>
-        ($<%= company.amount %>m)
-      <% end %>
-      <% if company.investors && !company.investors.empty? %>
-        — <%= company.investors.split(';').join(', ') %>
-      <% end %>
-    </li>
-  <% end %>
-</ol>
+<% if companies.length > 0 %>
+  <p style="margin-bottom: 10px;font-weight: normal;font-size: 14px;">
+    <%= companies_text %> successfully added to RelateIQ via CBInsights <%= report_name %> sweep:</p>
+  <ol style="margin:0;padding:0;margin-bottom: 10px;font-weight: normal;font-size: 14px;">
+    <% companies.each do |company| %>
+      <li style=" margin-left: 5px;list-style-position: inside; margin-bottom:10px">
+        <a style="color: #348eda;" href="<%= company.url %>"><%= company.name %></a>
+        <% if company.company_description && !company.company_description.empty? %>
+          — <i> &quot;<%= company.company_description %>.&quot; </i>
+        <% end %>
+        <br>
+        <%= company.round %>
+        <% if company.amount && !company.amount.empty? %>
+          ($<%= company.amount %>m)
+        <% end %>
+        <% if company.investors && !company.investors.empty? %>
+          — <%= company.investors.split(';').join(', ') %>
+        <% end %>
+      </li>
+    <% end %>
+  </ol>
+<% end %>
 <% if too_old.length > 0 %>
   <% deals = too_old.length == 1 ? '<strong>One</strong> deal was' : "<strong>#{too_old.length}</strong> deals were"%>
   <p style="margin-bottom: 10px;font-weight: normal;font-size: 14px;">
