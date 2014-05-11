@@ -8,12 +8,12 @@ class ImportResult
     @already_exists = already_exists || []
   end
 
-  def errors?
+  def should_send_error_email?
     !@failed.empty?
   end
 
-  def success?
-    !@parsed.empty?
+  def should_send_success_email?
+    !@parsed.empty? || !@too_old.empty? || !@already_exists.empty?
   end
 
 end

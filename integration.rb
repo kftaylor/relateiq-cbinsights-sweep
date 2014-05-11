@@ -32,20 +32,20 @@ configure do
   ##schema
 
   DB.create_table? :imports do
-    primary_key  :id
-    String       :report_name
-    Date         :date
-    String       :csv_content
-    String       :error_message
-    Date         :created_at
+    primary_key :id
+    String :report_name
+    Date :date
+    String :csv_content
+    String :error_message
+    Date :created_at
   end
 
   DB.create_table? :companies do
-    primary_key  :id
-    String       :name
-    Date         :date
-    Date         :created_at
-    HStore       :data
+    primary_key :id
+    String :name
+    Date :date
+    Date :created_at
+    HStore :data
   end
 end
 
@@ -73,8 +73,8 @@ post '/' do
     end
     import = Import.new(report_name, '535b4d8fe4b082b80fbf0618', tmpfile.read)
     import_result = import.process_csv
-    success_email(report_name, import_result) if import_result.success?
-    error_email(import_result) if import_result.errors?
+    success_email(report_name, import_result) if import_result.should_send_success_email?
+    error_email(import_result) if import_result.should_send_error_email?
     import.to_db
     status 201
   rescue => e
@@ -93,18 +93,28 @@ def success_email(report_name, import_result)
     from 'RelateIQ Robot <integration@relateiq-cbinsights-sweep.herokuapp.com>'
     subject "#{companies.length} relationship(s) added to RelateIQ via CBInsights"
     text_part do
-      companies_text = companies.length > 1 ? "#{companies.length} companies were" : 'One company was'
-      email = "#{companies_text} successfully added to RelateIQ via CBInsights (#{report_name}) sweep:\n"
-      companies.each_with_index do |c, i|
-        email << c.to_email(i+1)
+      email = ''
+      if companies.length > 0
+        companies_text = companies.length > 1 ? "#{companies.length} companies were" : 'One company was'
+        email = "#{companies_text} successfully added to RelateIQ via CBInsights (#{report_name}) sweep:\n"
+        companies.each_with_index do |c, i|
+          email << c.to_email(i+1)
+        end
+        email << "\n"
       end
       if import_result.too_old.length > 0
         too_old = import_result.too_old
         deals = too_old.length == 1 ? '1 deal was' : "#{too_old.length} deals were"
-        email << "\n #{deals} excluded due to a funding date:\n"
+        email << "#{deals} excluded due to a funding date:\n"
         too_old.each_with_index do |company, i|
           email << company.to_email(i+1)
         end
+        email << "\n"
+      end
+      if import_result.already_exists.length > 0
+        already_exists = import_result.already_exists
+        already_exists_text = already_exists.length == 1 ? 'one' : "#{already_exists.length} deals were"
+        email << "#{already_exists_text} companies excluded due to existing relationship in RelateIQ."
       end
       body email
     end
@@ -120,7 +130,7 @@ def success_email(report_name, import_result)
 end
 
 def weekly_email
-  companies = DB[:companies].where{created_at >= (Date.today - 7)}.all.map{|c| Company.from_db c}
+  companies = DB[:companies].where { created_at >= (Date.today - 7) }.all.map { |c| Company.from_db c }
   Mail.deliver do
     to 'taylor.k.f@gmail.com'
     cc 'vic.ivanoff@gmail.com'
