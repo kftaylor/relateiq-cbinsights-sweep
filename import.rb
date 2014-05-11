@@ -20,6 +20,7 @@ class Import
           too_old << company
           next
         end
+        next if exists(company)
         create_account_and_list_item(company)
         company.to_db(DB[:companies])
         parsed << company
@@ -57,6 +58,10 @@ class Import
         :created_at => Date.today,
         :csv_content => @csv,
     )
+  end
+
+  def exists(company)
+    DB[:companies].where(name: company.name).count > 0
   end
 
 end
