@@ -10,15 +10,15 @@ class Company
     @name = row['Company']
     @date = Date.parse(row['Date']) if row['Date'] && !row['Date'].empty?
     @created_at = Date.today
+    %w(description company url company description round date amount sector industry sub-industry country state city investors).each do |key|
+      @data[key] = nil
+    end
     row.each do |pair|
       @data[pair.first.downcase] = pair.last
     end
     @data['round'] = preprocess_round(@data['round'])
     @data['company description'] = @data['company description'].split('.').first if @data['company description']
     @data['description'] = @data['company description']
-    @headers = row.headers.map { |s| s.downcase }
-    @headers << %w(description company url company description round date amount sector industry sub-industry country state city investors)
-    @headers = @headers.flatten.uniq
   end
 
   def get(key)
@@ -81,7 +81,6 @@ class Company
     return @data[method.to_s] if @data[method.to_s]
     key = method.to_s.split('_').join(' ')
     return @data[key] if @data[key]
-    return nil if @headers.include?(method) || @headers.include?(key)
     super
   end
 end
