@@ -1,5 +1,5 @@
 class Company
-  attr_accessor   :name, :data, :date, :created_at
+  attr_accessor :name, :data, :date, :created_at
 
   def initialize(row = nil)
     @data = Hash.new
@@ -16,8 +16,9 @@ class Company
     @data['round'] = preprocess_round(@data['round'])
     @data['company description'] = @data['company description'].split('.').first if @data['company description']
     @data['description'] = @data['company description']
-    @headers = row.headers.map {|s| s.downcase}
-    @headers << 'description'
+    @headers = row.headers.map { |s| s.downcase }
+    @headers << %w(description company url company description round date amount sector industry sub-industry country state city investors)
+    @headers = @headers.flatten.uniq
   end
 
   def get(key)
@@ -31,7 +32,7 @@ class Company
   end
 
   def to_email(index = nil)
-    email = ""
+    email = ''
     email << (index ? "#{index}. #{@name}" : @name)
     email << " (#{url})" if url
     email << " - \"#{company_description}\"" if company_description
@@ -72,7 +73,7 @@ class Company
 
   def self.from_db(attrs)
     company = self.new
-    %w(name date created_at data).each {|attr| company.send(attr+'=', attrs[attr.to_sym])}
+    %w(name date created_at data).each { |attr| company.send(attr+'=', attrs[attr.to_sym]) }
     company
   end
 
