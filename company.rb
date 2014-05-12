@@ -75,7 +75,7 @@ class Company
     company = self.new
     %w(name date created_at).each { |attr| company.send(attr+'=', attrs[attr.to_sym]) }
     attrs[:data].each do |k,v|
-      @data[k] = v
+      company.data[k] = v
     end
     company
   end
