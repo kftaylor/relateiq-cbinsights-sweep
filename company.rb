@@ -3,16 +3,16 @@ class Company
 
   def initialize(row = nil)
     @data = Hash.new
+    %w(description company url company description round date amount sector industry sub-industry country state city investors).each do |key|
+      @data[key] = nil
+    end
+    @created_at = Date.today
     parse_row(row) if row
   end
 
   def parse_row(row)
     @name = row['Company']
     @date = Date.parse(row['Date']) if row['Date'] && !row['Date'].empty?
-    @created_at = Date.today
-    %w(description company url company description round date amount sector industry sub-industry country state city investors).each do |key|
-      @data[key] = nil
-    end
     row.each do |pair|
       @data[pair.first.downcase] = pair.last
     end
