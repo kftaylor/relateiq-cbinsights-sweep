@@ -26,7 +26,7 @@ class Import
         company.to_db(DB[:companies])
         result.parsed << company
       rescue => e
-        result.failed << {company: company.name, error: e.message}
+        result.failed << {company: company ? company.name : 'nil', error: e.message}
       end
     end
     result

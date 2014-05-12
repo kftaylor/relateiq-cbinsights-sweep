@@ -16,6 +16,8 @@ class Company
     @data['round'] = preprocess_round(@data['round'])
     @data['company description'] = @data['company description'].split('.').first if @data['company description']
     @data['description'] = @data['company description']
+    @headers = row.headers.map {|s| s.downcase}
+    @headers << 'description'
   end
 
   def get(key)
@@ -78,6 +80,7 @@ class Company
     return @data[method.to_s] if @data[method.to_s]
     key = method.to_s.split('_').join(' ')
     return @data[key] if @data[key]
+    return nil if @headers.include?(method) || @headers.include?(key)
     super
   end
 end
