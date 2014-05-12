@@ -3,7 +3,7 @@ class Company
 
   def initialize(row = nil)
     @data = Hash.new
-    %w(description company url company description round date amount sector industry sub-industry country state city investors).each do |key|
+    %w(description company url company\ description round date amount sector industry sub-industry country state city investors).each do |key|
       @data[key] = nil
     end
     @created_at = Date.today
@@ -74,7 +74,7 @@ class Company
   def self.from_db(attrs)
     company = self.new
     %w(name date created_at).each { |attr| company.send(attr+'=', attrs[attr.to_sym]) }
-    attrs[:data].each do |k,v|
+    attrs[:data].each do |k, v|
       company.data[k] = v
     end
     company
