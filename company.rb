@@ -84,6 +84,7 @@ class Company
     return @data[method.to_s] if @data[method.to_s]
     key = method.to_s.split('_').join(' ')
     return @data[key] if @data[key]
+    return nil if @data.has_key?(key) || @data.has_key?(method)
     super
   end
 end
