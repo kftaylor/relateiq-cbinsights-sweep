@@ -73,9 +73,9 @@ class Company
 
   def self.from_db(attrs)
     company = self.new
-    %w(name date created_at data).each { |attr| company.send(attr+'=', attrs[attr.to_sym]) }
-    %w(description company url company description round date amount sector industry sub-industry country state city investors).each do |key|
-      @data[key] = nil unless @data.has_key?(key)
+    %w(name date created_at).each { |attr| company.send(attr+'=', attrs[attr.to_sym]) }
+    attrs[:data].each do |k,v|
+      @data[k] = v
     end
     company
   end
