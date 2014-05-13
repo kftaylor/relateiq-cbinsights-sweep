@@ -23,6 +23,7 @@ configure do
         :address => ENV['MAILGUN_SMTP_SERVER'],
         :user_name => ENV['MAILGUN_SMTP_LOGIN'],
         :password => ENV['MAILGUN_SMTP_PASSWORD'],
+        :domain => 'relateiq-cbinsights-sweep.herokuapp.com',
         :authentication => :plain,
     }
   end
@@ -70,13 +71,14 @@ post '/' do
         (tmpfile = params['attachment-1'][:tempfile]) &&
         (name = params['attachment-1'][:filename])
       status 200
+    else
+      import = Import.new(report_name, '535b4d8fe4b082b80fbf0618', tmpfile.read)
+      import_result = import.process_csv
+      success_email(report_name, import_result) if import_result.should_send_success_email?
+      error_email(import_result) if import_result.should_send_error_email?
+      import.to_db
+      status 201
     end
-    import = Import.new(report_name, '535b4d8fe4b082b80fbf0618', tmpfile.read)
-    import_result = import.process_csv
-    success_email(report_name, import_result) if import_result.should_send_success_email?
-    error_email(import_result) if import_result.should_send_error_email?
-    import.to_db
-    status 201
   rescue => e
     logger.error e
     admin_error_email e
