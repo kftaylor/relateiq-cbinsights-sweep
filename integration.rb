@@ -11,8 +11,8 @@ require 'sequel/extensions/pg_hstore'
 configure do
   RelateIQ.configure(
       {
-          :api_key => '53594f98e4b0336349b975cc',
-          :api_secret => 'pF932KOSrtuVHielw9mrrohy6zM',
+          :api_key => '53740cf4e4b036f36f82d206',
+          :api_secret => 'BhVKVejoCEX1rxOYwHU5N0pKZeg',
           :base_url => 'https://api.relateiq.com/v2/',
           :version => 'v2'
       }
@@ -72,7 +72,7 @@ post '/' do
         (name = params['attachment-1'][:filename])
       status 200
     else
-      import = Import.new(report_name, '535b4d8fe4b082b80fbf0618', tmpfile.read)
+      import = Import.new(report_name, '537407a4e4b036f36f82c233', tmpfile.read)
       import_result = import.process_csv
       success_email(report_name, import_result) if import_result.should_send_success_email?
       error_email(import_result) if import_result.should_send_error_email?
@@ -91,8 +91,8 @@ def success_email(report_name, import_result)
   companies = import_result.parsed
   Mail.deliver do
     to 'taylor.k.f@gmail.com'
-    cc 'vic.ivanoff@gmail.com'
-    from 'RelateIQ Robot <integration@relateiq-cbinsights-sweep.herokuapp.com>'
+    bcc '7gegut07@robot.zapier.com'
+    from 'RelateIQ Robot <robots@upfront.com>'
     subject "#{companies.length} relationship(s) added to RelateIQ via CBInsights"
     text_part do
       email = ''
@@ -135,8 +135,8 @@ def weekly_email
   companies = DB[:companies].where { created_at >= (Date.today - 7) }.all.map { |c| Company.from_db c }
   Mail.deliver do
     to 'taylor.k.f@gmail.com'
-    cc 'vic.ivanoff@gmail.com'
-    from 'RelateIQ Robot <integration@relateiq-cbinsights-sweep.herokuapp.com>'
+    bcc '7gegut07@robot.zapier.com'
+    from 'RelateIQ Robot <robots@upfront.com>'
     subject 'Weekly RelateIQ email'
     text_part do
       companies_text = companies.length > 1 ? "#{companies.length} companies were" : 'one company was'
@@ -161,7 +161,8 @@ def admin_error_email(e)
   begin
     logger.error e.message
     Mail.deliver do
-      to 'vic.ivanoff@gmail.com'
+      to 'taylor.k.f@gmail.com'
+      cc 'vic.ivanoff@gmail.com'
       from 'RelateIQ Robot <integration@relateiq-cbinsights-sweep.herokuapp.com>'
       subject 'Something went wrong with the CBInsights email'
       text_part do
