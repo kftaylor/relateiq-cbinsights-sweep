@@ -3,10 +3,10 @@ class Company
 
   def initialize(row = nil)
     @data = Hash.new
-    %w(description company url company\ description round date amount sector industry sub-industry country state city investors).each do |key|
+    %w(description company url company\ description round date amount sector industry sub-industry country state city investors round\ investors).each do |key|
       @data[key] = nil
     end
-    @created_at = Date.today
+    @date = @created_at = Date.today
     parse_row(row) if row
   end
 
@@ -53,7 +53,7 @@ class Company
   def relate_iq_fields(list)
     keys = @data.keys
     fields = keys.select do |key|
-      list.fields.find { |f| f['name'].downcase == key }
+      @data[key] && list.fields.find { |f| f['name'].downcase == key }
     end.map do |key|
       f = list.fields.find { |f| f['name'].downcase == key }
       [f['id'], [{'raw' => @data[key.to_s]}]]

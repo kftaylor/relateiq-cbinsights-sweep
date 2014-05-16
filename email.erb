@@ -8,17 +8,19 @@
   <ol style="margin:0;padding:0;margin-bottom: 10px;font-weight: normal;font-size: 14px;">
     <% companies.each do |company| %>
       <li style=" margin-left: 5px;list-style-position: inside; margin-bottom:10px">
-        <a style="color: #348eda;" href="<%= company.url %>"><%= company.name %></a>
+        <a style="color: #348eda;" href="<%= company.url || '#' %>"><%= company.name %></a>
         <% if company.company_description && !company.company_description.empty? %>
           — <i> &quot;<%= company.company_description %>.&quot; </i>
         <% end %>
         <br>
-        <%= company.round %>
-        <% if company.amount && !company.amount.empty? %>
-          ($<%= company.amount %>m)
-        <% end %>
-        <% if company.investors && !company.investors.empty? %>
-          — <%= company.investors.split(';').join(', ') %>
+        <strong>
+          <%= company.round %>
+          <% if company.amount && !company.amount.empty? %>
+            ($<%= company.amount %>m)
+          <% end %>
+        </strong>
+        <% if company.round_investors && !company.round_investors.empty? %>
+          — <%= company.round_investors.split(';').join(', ') %>
         <% end %>
       </li>
     <% end %>

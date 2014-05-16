@@ -66,7 +66,8 @@ post '/' do
   begin
     logger.info params['attachment-1']
     logger.info params['Subject']
-    report_name = params['Subject'].gsub('Fwd: Scheduled Report - ', '')
+    report_name = params['Subject'].gsub('Fwd: Scheduled Report - ', '').
+        gsub('(New)', '').gsub(' Scheduled Report - ', '')
     unless params['attachment-1'] &&
         (tmpfile = params['attachment-1'][:tempfile]) &&
         (name = params['attachment-1'][:filename])
