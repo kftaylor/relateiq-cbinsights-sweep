@@ -73,7 +73,7 @@ post '/' do
         (name = params['attachment-1'][:filename])
       status 200
     else
-      import = Import.new(report_name, '537407a4e4b036f36f82c233', tmpfile.read)
+      import = Import.new(report_name, '53349876e4b04da8d9a26641', tmpfile.read)
       import_result = import.process_csv
       success_email(report_name, import_result) if import_result.should_send_success_email?
       error_email(import_result) if import_result.should_send_error_email?
@@ -91,14 +91,13 @@ end
 def success_email(report_name, import_result)
   companies = import_result.parsed
   Mail.deliver do
-    to 'taylor.k.f@gmail.com'
-    bcc '7gegut07@robot.zapier.com'
+    to 'kyle@upfront.com'
     from 'RelateIQ Robot <robots@upfront.com>'
     subject "#{companies.length} relationship(s) added to RelateIQ via CBInsights"
     text_part do
       email = ''
       if companies.length > 0
-        companies_text = companies.length > 1 ? "#{companies.length} companies were" : 'One company was'
+        companies_text = companies.length > 1 ? "#{companies.length} companies were" : '1 company was'
         email = "#{companies_text} successfully added to RelateIQ via CBInsights (#{report_name}) sweep:\n"
         companies.each_with_index do |c, i|
           email << c.to_email(i+1)
@@ -116,7 +115,7 @@ def success_email(report_name, import_result)
       end
       if import_result.already_exists.length > 0
         already_exists = import_result.already_exists
-        already_exists_text = already_exists.length == 1 ? 'one' : "#{already_exists.length} deals were"
+        already_exists_text = already_exists.length == 1 ? '1' : "#{already_exists.length} deals were"
         email << "#{already_exists_text} companies excluded due to existing relationship in RelateIQ."
       end
       body email
@@ -135,12 +134,11 @@ end
 def weekly_email
   companies = DB[:companies].where { created_at >= (Date.today - 7) }.all.map { |c| Company.from_db c }
   Mail.deliver do
-    to 'taylor.k.f@gmail.com'
-    bcc '7gegut07@robot.zapier.com'
+    to 'kyle@upfront.com'
     from 'RelateIQ Robot <robots@upfront.com>'
     subject 'Weekly RelateIQ email'
     text_part do
-      companies_text = companies.length > 1 ? "#{companies.length} companies were" : 'one company was'
+      companies_text = companies.length > 1 ? "#{companies.length} companies were" : '1 company was'
       email = "This week #{companies_text} successfully added to RelateIQ via CBinsights sweep:\n"
       companies.each_with_index do |c, i|
         email << c.to_email(i+1)
