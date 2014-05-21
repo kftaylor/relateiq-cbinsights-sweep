@@ -97,7 +97,7 @@ def success_email(report_name, import_result)
     text_part do
       email = ''
       if companies.length > 0
-        companies_text = companies.length > 1 ? "#{companies.length} companies were" : '1 company was'
+        companies_text = companies.length > 1 ? "#{companies.length} companies were" : 'One company was'
         email = "#{companies_text} successfully added to RelateIQ via CBInsights (#{report_name}) sweep:\n"
         companies.each_with_index do |c, i|
           email << c.to_email(i+1)
@@ -106,7 +106,7 @@ def success_email(report_name, import_result)
       end
       if import_result.too_old.length > 0
         too_old = import_result.too_old
-        deals = too_old.length == 1 ? '1 deal was' : "#{too_old.length} deals were"
+        deals = too_old.length == 1 ? 'One deal was' : "#{too_old.length} deals were"
         email << "#{deals} excluded due to a funding date:\n"
         too_old.each_with_index do |company, i|
           email << company.to_email(i+1)
@@ -115,7 +115,7 @@ def success_email(report_name, import_result)
       end
       if import_result.already_exists.length > 0
         already_exists = import_result.already_exists
-        already_exists_text = already_exists.length == 1 ? '1' : "#{already_exists.length} deals were"
+        already_exists_text = already_exists.length == 1 ? 'One' : "#{already_exists.length} deals were"
         email << "#{already_exists_text} companies excluded due to existing relationship in RelateIQ."
       end
       body email
@@ -138,7 +138,7 @@ def weekly_email
     from 'RelateIQ Robot <robots@upfront.com>'
     subject 'Weekly RelateIQ email'
     text_part do
-      companies_text = companies.length > 1 ? "#{companies.length} companies were" : '1 company was'
+      companies_text = companies.length > 1 ? "#{companies.length} companies were" : 'One company was'
       email = "This week #{companies_text} successfully added to RelateIQ via CBinsights sweep:\n"
       companies.each_with_index do |c, i|
         email << c.to_email(i+1)
