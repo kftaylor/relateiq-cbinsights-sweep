@@ -134,9 +134,10 @@ end
 def weekly_email
   companies = DB[:companies].where { created_at >= (Date.today - 7) }.all.map { |c| Company.from_db c }
   Mail.deliver do
-    to 'kyle@upfront.com'
-    from 'RelateIQ Robot <robots@upfront.com>'
-    subject 'Weekly RelateIQ email'
+    to 'associates@upfront.com'
+    cc 'greg@upfront.com'
+    from 'Kyle Taylor <kyle@upfront.com>'
+    subject 'RelateIQ Sweep Update'
     text_part do
       companies_text = companies.length > 1 ? "#{companies.length} companies were" : 'One company was'
       email = "This week #{companies_text} successfully added to RelateIQ via CBinsights sweep:\n"
