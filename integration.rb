@@ -132,7 +132,13 @@ def success_email(report_name, import_result)
 end
 
 def weekly_email
-  companies = DB[:companies].where { created_at >= (Date.today - 7) }.all.map { |c| Company.from_db c }
+  companies = DB[:companies].where { created_at >= (Date.today - 7) }.all.
+      map { |c| Company.from_db c }.
+      reject {|c| c.is_too_old?}
+  if companies.count == 0
+    status 200
+    return
+  end
   Mail.deliver do
     to 'associates@upfront.com'
     cc 'greg@upfront.com'
