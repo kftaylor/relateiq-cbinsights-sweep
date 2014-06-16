@@ -141,7 +141,7 @@ def weekly_email
   end
   Mail.deliver do
     to 'associates@upfront.com'
-    cc 'greg@upfront.com'
+    cc ['greg@upfront.com','hamet@upfront.com','stuart@upfront.com']
     from 'Kyle Taylor <kyle@upfront.com>'
     subject 'RelateIQ Sweep Update'
     text_part do
